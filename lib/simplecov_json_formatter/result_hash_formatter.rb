@@ -19,7 +19,7 @@ module SimpleCovJSONFormatter
 
     def format_files
       @result.files.each do |source_file|
-        formatted_result[:coverage][source_file.filename] =
+        formatted_result[:coverage][resolve_filename(source_file.filename)] =
           format_source_file(source_file)
       end
     end
@@ -47,6 +47,14 @@ module SimpleCovJSONFormatter
     def format_source_file(source_file)
       source_file_formatter = SourceFileFormatter.new(source_file)
       source_file_formatter.format
+    end
+
+    def resolve_filename(filename)
+      Pathname.new(filename).relative_path_from(project_root).to_s
+    end
+
+    def project_root
+      @project_root ||= Pathname.new(SimpleCov.root)
     end
   end
 end
